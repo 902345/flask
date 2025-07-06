@@ -1,21 +1,29 @@
 from flask import Flask, render_template, request
 import pickle
 import pandas as pd
+import os
 
 app = Flask(__name__)
 
 # Load model files
-with open('best_model.pkl', 'rb') as f:
-    model = pickle.load(f)
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
-with open('columns.pkl', 'rb') as f:
-    columns = pickle.load(f)
-with open('label_encoder_name.pkl', 'rb') as f:
-    le_name = pickle.load(f)
+try:
+    with open('best_model.pkl', 'rb') as f:
+        model = pickle.load(f)
+    with open('scaler.pkl', 'rb') as f:
+        scaler = pickle.load(f)
+    with open('columns.pkl', 'rb') as f:
+        columns = pickle.load(f)
+    with open('label_encoder_name.pkl', 'rb') as f:
+        le_name = pickle.load(f)
+except Exception as e:
+    print(f"❌ Failed to load model files: {e}")
+    model = None
+    scaler = None
+    columns = []
+    le_name = None
 
 # Load car names for dropdown
-car_names = list(le_name.classes_)
+car_names = list(le_name.classes_) if le_name else []
 
 @app.route('/')
 def home():
@@ -55,12 +63,13 @@ def predict():
             df_scaled = scaler.transform(df_input)
             prediction = model.predict(df_scaled)[0]
             return render_template('predict.html', prediction=round(prediction, 2), car_names=car_names)
-        
+
         except Exception as e:
-            print("❌ Error:", e)
+            print("❌ Error during prediction:", e)
             return render_template('predict.html', prediction="Error occurred", car_names=car_names)
 
     return render_template('predict.html', prediction=None, car_names=car_names)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
