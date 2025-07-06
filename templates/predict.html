@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Car Price</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-nav {
+            position: absolute;
+            top: 20px;
+            left: 30px;
+        }
+
+        .home-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .home-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-container {
+            padding: 40px 30px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group input:hover,
+        .form-group select:hover {
+            border-color: #bbb;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .prediction-result {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 25px;
+            margin-top: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .prediction-result h2 {
+            font-size: 1.8rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            background: #6c757d;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .back-btn:hover {
+            background: #5a6268;
+        }
+
+        .form-section {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 25px;
+            margin-bottom: 25px;
+        }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+
+        .section-title {
+            color: #667eea;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-icon {
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 12px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header-nav {
+                left: 20px;
+                top: 15px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header-nav {
+                left: 15px;
+                top: 15px;
+            }
+            
+            .home-btn {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+            
+            .form-container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-nav">
+                <a href="/" class="home-btn">🏠 Home</a>
+            </div>
+            <h1>🚗 Car Price Predictor</h1>
+            <p>Get accurate market value predictions for your vehicle</p>
+        </div>
+
+        <div class="form-container">
+            <form method="POST">
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">1</div>
+                        Basic Information
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="name">Car Name</label>
+                            <select name="name" id="name" required>
+                                {% for cname in car_names %}
+                                    <option value="{{ cname }}">{{ cname }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="year">Manufacturing Year</label>
+                            <input type="number" name="year" id="year" required placeholder="e.g., 2020">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="km_driven">KM Driven</label>
+                            <input type="number" name="km_driven" id="km_driven" required placeholder="e.g., 25000">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seats">Number of Seats</label>
+                            <input type="number" name="seats" id="seats" required placeholder="e.g., 5">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">2</div>
+                        Technical Specifications
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="mileage">Mileage (km/l)</label>
+                            <input type="text" name="mileage" id="mileage" required placeholder="e.g., 18.5">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="engine">Engine (cc)</label>
+                            <input type="text" name="engine" id="engine" required placeholder="e.g., 1200">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="max_power">Max Power (bhp)</label>
+                            <input type="text" name="max_power" id="max_power" required placeholder="e.g., 85">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fuel">Fuel Type</label>
+                            <select name="fuel" id="fuel" required>
+                                <option value="Petrol">Petrol</option>
+                                <option value="Diesel">Diesel</option>
+                                <option value="Electric">Electric</option>
+                                <option value="LPG">LPG</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <div class="section-title">
+                        <div class="section-icon">3</div>
+                        Ownership & Details
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="owner">Owner Type</label>
+                            <select name="owner" id="owner" required>
+                                <option value="0">Test Drive Car</option>
+                                <option value="1">First Owner</option>
+                                <option value="2">Second Owner</option>
+                                <option value="3">Third Owner</option>
+                                <option value="4">Fourth & Above Owner</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seller_type">Seller Type</label>
+                            <select name="seller_type" id="seller_type" required>
+                                <option value="Individual">Individual</option>
+                                <option value="Trustmark Dealer">Trustmark Dealer</option>
+                                <option value="Dealer">Dealer</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="transmission">Transmission</label>
+                            <select name="transmission" id="transmission" required>
+                                <option value="Manual">Manual</option>
+                                <option value="Automatic">Automatic</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-container">
+                    <button type="submit" class="submit-btn">
+                        🔍 Get Price Prediction
+                    </button>
+                </div>
+            </form>
+
+            {% if prediction is not none %}
+                <div class="prediction-result">
+                    <h2>💰 Predicted Selling Price: ₹{{ prediction }}</h2>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Add some basic form validation and user experience improvements
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            // Add loading state to submit button
+            form.addEventListener('submit', function() {
+                submitBtn.innerHTML = '⏳ Calculating...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
+</body>
+</html>
